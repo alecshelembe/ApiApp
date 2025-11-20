@@ -1,98 +1,312 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
+import React, { useState, useEffect } from "react";
+#import { firebaseApp } from "@/firebase"; // Adjust path to match your project
+import { WebView } from "react-native-webview";
+import ThemedButton from "@/components/ThemedButton";
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import ImageViewing from 'react-native-image-viewing';
+import { TouchableOpacity } from 'react-native';
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+} from "react-native";
+
+// Define your base URLs here for easy management
+const API_BASE_URL = 'https://visitmyjoburg.co.za/api';
+const STORAGE_BASE_URL = 'https://visitmyjoburg.co.za/storage';
+const IMAGE_BASE_URL = 'https://visitmyjoburg.co.za'; // For images that aren't in /storage
+
+interface SocialPost {
+  id: number;
+  fee: string;
+  description: string;
+  images: string[];
+  email: string;
+  status: string;
+  comments: { id: number; author: string; content: string; created_at: string }[] | null;
+  place_name: string;
+  created_at: string;
+  video_link: string | null;
+  extras: string[] | null; // Renamed amenities to extras to match API
+  profile_image_url: string | null; // Added profile_image_url
 }
 
+
+const SocialPostCard: React.FC = () => {
+  const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [isViewerVisible, setIsViewerVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [viewerImages, setViewerImages] = useState<{ uri: string }[]>([]);
+
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/get-social-posts`);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: Failed to fetch posts`);
+        }
+        const data = await response.json();
+        if (data && data.data && Array.isArray(data.data)) {
+          const parsedData = data.data.map((post: any) => ({
+            ...post,
+            images: JSON.parse(post.images),
+            extras: post.extras || null, // Keep extras as is
+          }));
+          setPosts(parsedData);
+        } else {
+          setError("Invalid data from API.");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch posts.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const getYouTubeVideoId = (url: string | null): string | null => {
+    if (!url) return null;
+    const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const renderPostCard = ({ item }: { item: SocialPost }) => {
+    const videoId = getYouTubeVideoId(item.video_link);
+    return (
+
+      <View style={styles.card}>
+        <View style={styles.header}>
+          
+          {item.profile_image_url ? (
+            <Image
+              source={{ uri: `${STORAGE_BASE_URL}/${item.profile_image_url}` }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <View style={styles.placeholderImage} />
+          )}
+          <View style={styles.headerText}>
+            <Text style={styles.title}>{item.first_name}</Text>
+            <Text style={styles.date}>
+              {new Date(item.created_at).toLocaleDateString(undefined, {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.detailsCard}>
+          
+          <Text style={styles.description}>{item.address}</Text>
+          <Text style={styles.title}>{item.place_name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.description}>{item.note}</Text>
+          <Text style={styles.fee}>R {item.fee}</Text>
+        </View>
+
+        {item.images && item.images.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageContainer}>
+            {item.images.map((img, index) => {
+              const imageUri = `${IMAGE_BASE_URL}/${img}`;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setViewerImages(item.images.map(i => ({ uri: `${IMAGE_BASE_URL}/${i}` })));
+                    setCurrentImageIndex(index);
+                    setIsViewerVisible(true);
+                  }}
+                >
+                  <Image source={{ uri: imageUri }} style={styles.image} />
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <Text style={styles.noImagesText}>No images available.</Text>
+        )}
+
+
+        {videoId && (
+          <View style={styles.videoContainer}>
+            <WebView
+              style={styles.webView}
+              javaScriptEnabled={true}
+              source={{ uri: `https://www.youtube.com/embed/${videoId}` }}
+            />
+          </View>
+        )}
+
+        {item.extras && item.extras.length > 0 && (
+          <View style={styles.amenitiesContainer}>
+            <Text style={styles.amenitiesTitle}>Amenities:</Text>
+            <Text style={styles.amenitiesText}>{item.extras.join(', ')}</Text>
+          </View>
+        )}
+
+        {item.comments && item.comments.length > 0 && (
+          <View style={styles.commentsContainer}>
+            <Text style={styles.commentsTitle}>Comments:</Text>
+            {item.comments.map((comment, index) => (
+              <Text key={index} style={styles.commentText}>
+                <Text style={styles.commentAuthor}>{comment.author}: </Text>
+                {comment.content}
+              </Text>
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  return (
+
+    <SafeAreaView style={{ flex: 1 }}>
+      <FlatList
+        data={posts}
+        renderItem={renderPostCard}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <ImageViewing
+        images={viewerImages}
+        imageIndex={currentImageIndex}
+        visible={isViewerVisible}
+        onRequestClose={() => setIsViewerVisible(false)}
+      />
+
+      {/* Add Button Here */}
+
+      <ThemedView style={styles.buttonContainer}>
+        <ThemedButton title="Get My location!" theme="primary" onPress={() => alert("Button Pressed!")} />
+      </ThemedView>
+
+    </SafeAreaView>
+  );
+};
+
 const styles = StyleSheet.create({
-  titleContainer: {
+  popup: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContainer: { padding: 5, marginTop: 25 },
+  card: {
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    elevation: 3,
+
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 12,
   },
-  stepContainer: {
-    gap: 8,
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  placeholderImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ddd',
+    marginRight: 12,
+  },
+  headerText: {
+    flex: 1,
+  },
+  detailsCard: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  title: { fontSize: 18, fontWeight: "600", marginBottom: 4, color: "#333" },
+  date: { fontSize: 12, color: "#777", marginBottom: 8 },
+  fee: { fontSize: 16, marginBottom: 8, color: "#444" },
+  description: { fontSize: 15, color: "#555", marginBottom: 16, lineHeight: 22 },
+  imageContainer: { marginBottom: 16, flexDirection: "row" },
+  image: { width: 200, height: 200, borderRadius: 8, marginRight: 12 },
+  commentsContainer: { marginTop: 16 },
+  commentsTitle: { fontWeight: "600", marginBottom: 8, color: "#333" },
+  commentText: { fontSize: 14, color: "#666", marginBottom: 4 },
+  commentAuthor: { fontWeight: 'bold' },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+  errorText: { color: "red", fontSize: 18, textAlign: "center" },
+  noImagesText: { fontStyle: "italic", color: "#aaa", marginTop: 12 },
+  videoContainer: {
+    width: "100%",
+    height: 250,
+    marginTop: 16,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  webView: {
+    flex: 1,
+  },
+  amenitiesContainer: {
+    marginTop: 16,
+  },
+  amenitiesTitle: {
+    fontWeight: '600',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  amenitiesText: {
+    fontSize: 14,
+    color: '#666',
+  }
 });
+
+export default SocialPostCard;

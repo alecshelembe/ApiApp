@@ -1,0 +1,14 @@
+sdkmanager --list
+emulator -list-avds
+avdmanager delete avd -n Android_36_Emulator
+emulator -avd -name
+source ~/.bashrc
+export ANDROID_SDK_ROOT=$ANDROID_HOME
+export ANDROID_HOME=/home/alec/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/build-tools:$ANDROID_HOME/cmdline-tools/latest/bin
+echo $ANDROID_HOME
+adb devices
+echo "no" | avdmanager create avd     --name "androidEmulator"     --package "system-images;android-36;google_apis_playstore;x86_64"     --device "pixel_6"
+./adb shell settings put global enable_auto_power_modes 1
+./adb shell settings put glodal app_standby_enabled 1
+./adb shell settings put global heads_up_notifications_enabled 0
