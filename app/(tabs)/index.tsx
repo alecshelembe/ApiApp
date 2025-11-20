@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-#import { firebaseApp } from "@/firebase"; // Adjust path to match your project
 import { WebView } from "react-native-webview";
-import ThemedButton from "@/components/ThemedButton";
+import ThemedButton from "@/components/themed-button";
 import { ThemedView } from '@/components/themed-view';
 import ImageViewing from 'react-native-image-viewing';
 import { TouchableOpacity } from 'react-native';
@@ -19,9 +18,9 @@ import {
 } from "react-native";
 
 // Define your base URLs here for easy management
-const API_BASE_URL = 'https://visitmyjoburg.co.za/api';
-const STORAGE_BASE_URL = 'https://visitmyjoburg.co.za/storage';
-const IMAGE_BASE_URL = 'https://visitmyjoburg.co.za'; // For images that aren't in /storage
+const API_BASE_URL = 'https://app.beyourownself.co.za.co.za/api';
+const STORAGE_BASE_URL = 'https://app.beyourownself.co.za.co.za/storage';
+const IMAGE_BASE_URL = 'https://app.beyourownself.co.za.co.za'; // For images that aren't in /storage
 
 interface SocialPost {
   id: number;
