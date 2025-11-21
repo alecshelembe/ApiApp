@@ -18,9 +18,9 @@ import {
 } from "react-native";
 
 // Define your base URLs here for easy management
-const API_BASE_URL = 'https://app.beyourownself.co.za.co.za/api';
-const STORAGE_BASE_URL = 'https://app.beyourownself.co.za.co.za/storage';
-const IMAGE_BASE_URL = 'https://app.beyourownself.co.za.co.za'; // For images that aren't in /storage
+const API_BASE_URL = 'https://app.beyourownself.co.za/api';
+const STORAGE_BASE_URL = 'https://app.beyourownself.co.za/storage';
+const IMAGE_BASE_URL = 'https://app.beyourownself.co.za'; // For images that aren't in /storage
 
 interface SocialPost {
   id: number;
