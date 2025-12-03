@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { firebase } from "@firebase"; 
 import { WebView } from "react-native-webview";
 import ThemedButton from "@/components/themed-button";
 import { ThemedView } from '@/components/themed-view';
