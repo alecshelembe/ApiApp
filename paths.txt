@@ -13,4 +13,4 @@ echo "no" | avdmanager create avd     --name "androidEmulator"     --package "sy
 ./adb shell settings put glodal app_standby_enabled 1
 ./adb shell settings put global heads_up_notifications_enabled 0
 emulator -avd androidEmulator -qemu -enable-kvm -gpu host
-
+eas build -p android
