@@ -19,9 +19,9 @@ import {
 } from "react-native";
 
 // Define your base URLs here for easy management
-const API_BASE_URL = 'https://app.beyourownself.co.za/api';
-const STORAGE_BASE_URL = 'https://app.beyourownself.co.za/storage';
-const IMAGE_BASE_URL = 'https://app.beyourownself.co.za'; // For images that aren't in /storage
+const API_BASE_URL = 'https://pc.beyourownself.co.za/api';
+const STORAGE_BASE_URL = 'https://pc.beyourownself.co.za/storage';
+const IMAGE_BASE_URL = 'https://pc.beyourownself.co.za'; // For images that aren't in /storage
 
 interface SocialPost {
   id: number;
@@ -227,7 +227,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  listContainer: { padding: 5, marginTop: 25 },
+  listContainer: { 
+	padding: 20, 
+	marginTop: 25,
+	backgroundColor: "#000000", 
+  },
   card: {
     backgroundColor: "#fff",
     shadowColor: "#000",

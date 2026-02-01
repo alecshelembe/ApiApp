@@ -5,7 +5,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import ModalPopUp from './ModalPopUp';  // Import the ModalPopUp component
 
-const API_BASE_URL = 'https://app.beyourownself.co.za/api';
+const API_BASE_URL = 'https://pc.beyourownself.co.za/api';
 
 const LocationUploader = ({ onLocationSuccess }) => {
   const [locationData, setLocationData] = useState(null);  // This will store the server's response
