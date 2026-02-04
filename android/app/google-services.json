@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1020934262830",
-    "project_id": "sadies-bistro",
-    "storage_bucket": "sadies-bistro.firebasestorage.app"
+    "project_number": "769782288863",
+    "project_id": "phoenixcl-3f0c4",
+    "storage_bucket": "phoenixcl-3f0c4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1020934262830:android:12c613b1903c5774ac8fbf",
+        "mobilesdk_app_id": "1:769782288863:android:f0a326524066d1c6a2346a",
         "android_client_info": {
           "package_name": "com.anonymous.MyApp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC0qNWphatF70C0vLNmGYgDuVuLX8H4Tp4"
+          "current_key": "AIzaSyBMZCBHdUpBArJTz3o8C8hvcWcgNWbsU6Q"
         }
       ],
       "services": {

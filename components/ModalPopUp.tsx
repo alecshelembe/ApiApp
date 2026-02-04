@@ -64,7 +64,6 @@ const ModalPopUp = ({ locationData, onClose }) => {
 
                 <Text style={styles.label}>{actualLocation.address}</Text>
                 <Text style={styles.description}>{actualLocation.description}</Text>
-                <Text style={styles.label}>Booking Fee: {actualLocation.fee} ZAR</Text>
 
                 {actualLocation.extras && (
                   <Text style={styles.label}>
@@ -148,19 +147,19 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#f1f1f1',
     padding: 15,
-    borderRadius: 12,
-    width: '90%',
+    borderRadius: 16,
+    width: '100%',
     maxHeight: '80%',
     
     overflow: 'scroll',
-    elevation: 10,
+    elevation: 5,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 4 },
     
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 10,
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 100,
     height: 100,
-    borderRadius: 8,
+    borderRadius: 16,
     marginBottom: 10,
     marginRight: 10,
   },
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   comment: {
-    fontSize: 13,
+    fontSize: 12,
     marginBottom: 2,
   },
 });

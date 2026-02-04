@@ -5,7 +5,8 @@ import ThemedButton from "@/components/themed-button";
 import { ThemedView } from '@/components/themed-view';
 import ImageViewing from 'react-native-image-viewing';
 import { TouchableOpacity } from 'react-native';
-
+import { Linking } from 'react-native';
+import AuthSection from '@/components/AuthSection';
 
 import {
   View,
@@ -16,10 +17,12 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
+  Button,
 } from "react-native";
 
 // Define your base URLs here for easy management
 const API_BASE_URL = 'https://pc.beyourownself.co.za/api';
+const BASE_URL = 'https://pc.beyourownself.co.za/';
 const STORAGE_BASE_URL = 'https://pc.beyourownself.co.za/storage';
 const IMAGE_BASE_URL = 'https://pc.beyourownself.co.za'; // For images that aren't in /storage
 
@@ -32,12 +35,14 @@ interface SocialPost {
   status: string;
   comments: { id: number; author: string; content: string; created_at: string }[] | null;
   place_name: string;
+  first_name: string; // Add this
+  note: string;       // Add this
+  address: string;    // Add this
   created_at: string;
   video_link: string | null;
   extras: string[] | null; // Renamed amenities to extras to match API
   profile_image_url: string | null; // Added profile_image_url
 }
-
 
 const SocialPostCard: React.FC = () => {
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -119,7 +124,12 @@ const SocialPostCard: React.FC = () => {
           <Text style={styles.title}>{item.place_name}</Text>
           <Text style={styles.description}>{item.description}</Text>
           <Text style={styles.description}>{item.note}</Text>
-          <Text style={styles.fee}>R {item.fee}</Text>
+          <View style={styles.closeButtonWrapper}>
+		  <Button 
+		    title="View Post" 
+		    onPress={() => Linking.openURL(`${BASE_URL}view-social-post/${item.id}`)} 		     
+		   />
+		</View>
         </View>
 
         {item.images && item.images.length > 0 ? (
@@ -197,6 +207,7 @@ const SocialPostCard: React.FC = () => {
 
     <SafeAreaView style={{ flex: 1 }}>
       <FlatList
+	ListHeaderComponent={<AuthSection />} // <--- Makes it scrollable
         data={posts}
         renderItem={renderPostCard}
         keyExtractor={(item) => item.id.toString()}
@@ -228,8 +239,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContainer: { 
-	padding: 20, 
-	marginTop: 25,
+	paddingBottom: 5,
+	paddingTop:5,
+	padding: 8,
 	backgroundColor: "#000000", 
   },
   card: {
@@ -240,7 +252,8 @@ const styles = StyleSheet.create({
 
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
+    marginTop:18,
+    marginBottom: 18,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
   },
@@ -250,15 +263,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
     marginRight: 12,
   },
   placeholderImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
     backgroundColor: '#ddd',
     marginRight: 12,
   },
@@ -280,9 +293,9 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "600", marginBottom: 4, color: "#333" },
   date: { fontSize: 12, color: "#777", marginBottom: 8 },
   fee: { fontSize: 16, marginBottom: 8, color: "#444" },
-  description: { fontSize: 15, color: "#555", marginBottom: 16, lineHeight: 22 },
+  description: { fontSize: 15, color: "#555", marginBottom: 6, lineHeight: 22 },
   imageContainer: { marginBottom: 16, flexDirection: "row" },
-  image: { width: 200, height: 200, borderRadius: 8, marginRight: 12 },
+  image: { width: 200, height: 200, borderRadius: 16, marginRight: 12 },
   commentsContainer: { marginTop: 16 },
   commentsTitle: { fontWeight: "600", marginBottom: 8, color: "#333" },
   commentText: { fontSize: 14, color: "#666", marginBottom: 4 },
@@ -294,7 +307,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 250,
     marginTop: 16,
-    borderRadius: 8,
+    borderRadius: 16,
     overflow: "hidden",
   },
   webView: {
@@ -307,9 +320,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
   },
+  closeButtonWrapper: {
+    marginTop: 2,
+    borderRadius: 8,
+    overflow: 'hidden', // gives rounded corners effect
+    borderColor: 'black',
+    borderWidth: 1,
+    color:'black',
+    backgroundColor:'#f5f5f5',
+  },
+
   amenitiesText: {
     fontSize: 14,
-    color: '#666',
+    color: 'black',
   }
 });
 
