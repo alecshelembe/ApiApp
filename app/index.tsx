@@ -7,6 +7,7 @@ import ImageViewing from 'react-native-image-viewing';
 import { TouchableOpacity } from 'react-native';
 import { Linking } from 'react-native';
 import AuthSection from '@/components/AuthSection';
+import SearchComponent from '@/components/SearchFeature';
 
 import {
   View,
@@ -207,8 +208,8 @@ const SocialPostCard: React.FC = () => {
 
     <SafeAreaView style={{ flex: 1 }}>
       <FlatList
-	ListHeaderComponent={<AuthSection />} // <--- Makes it scrollable
-        data={posts}
+        ListHeaderComponent={<SearchComponent/>} // <--- Makes it scrollable
+	data={posts}
         renderItem={renderPostCard}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
@@ -239,8 +240,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContainer: { 
-	paddingBottom: 5,
-	paddingTop:5,
+	paddingBottom: 20,
+	paddingTop:20,
 	padding: 8,
 	backgroundColor: "#000000", 
   },
