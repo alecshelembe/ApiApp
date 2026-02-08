@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { firebase } from "@firebase"; 
-import { WebView } from "react-native-webview";
 import ThemedButton from "@/components/themed-button";
 import { ThemedView } from '@/components/themed-view';
+import React, { useEffect, useState } from "react";
+import { Linking, TouchableOpacity } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
-import { TouchableOpacity } from 'react-native';
-import { Linking } from 'react-native';
-import AuthSection from '@/components/AuthSection';
+import { WebView } from "react-native-webview";
 import SearchComponent from '@/components/SearchFeature';
 
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  FlatList,
-  ScrollView,
-  SafeAreaView,
   ActivityIndicator,
   Button,
+  FlatList,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 // Define your base URLs here for easy management
@@ -225,7 +222,7 @@ const SocialPostCard: React.FC = () => {
 
       {/* Add Button Here */}
 
-      <ThemedView style={styles.buttonContainer}>
+      <ThemedView>
         <ThemedButton title="Get My location!" theme="primary" onPress={() => alert("Button Pressed!")} />
       </ThemedView>
 

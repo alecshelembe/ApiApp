@@ -63,7 +63,6 @@ const SearchComponent = () => {
 
   return (
     <View style={styles.container}>
-	<Text style={styles.headerText}>Welcome to Phoenix Cleaners</Text>
       <TextInput
         placeholder="Search..."
         value={query}
@@ -133,13 +132,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
     elevation: 3,
-  },
-  headerText: {
-    fontSize: 16,
-    marginBottom: 10,
-    marginTop:10,
-    color: 'black',
-    alignItems: center,
   },
   input: {
     height: 45,
