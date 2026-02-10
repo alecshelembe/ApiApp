@@ -149,7 +149,7 @@ const SocialPostCard: React.FC = () => {
             })}
           </ScrollView>
         ) : (
-          <Text style={styles.noImagesText}>No images available.</Text>
+          {/*<Text style={styles.noImagesText}>No images available.</Text>*/}
         )}
 
 
@@ -165,7 +165,7 @@ const SocialPostCard: React.FC = () => {
 
         {item.extras && item.extras.length > 0 && (
           <View style={styles.amenitiesContainer}>
-            <Text style={styles.amenitiesTitle}>Amenities:</Text>
+            {/*<Text style={styles.amenitiesTitle}>Amenities:</Text>*/}
             <Text style={styles.amenitiesText}>{item.extras.join(', ')}</Text>
           </View>
         )}
@@ -322,10 +322,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     borderRadius: 8,
     overflow: 'hidden', // gives rounded corners effect
-    borderColor: 'black',
     borderWidth: 1,
-    color:'black',
-    backgroundColor:'#f5f5f5',
   },
 
   amenitiesText: {

@@ -9,15 +9,28 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Image,
+  Linking,
+  Button,
 } from 'react-native';
 import axios from 'axios';
+import ImageViewing from 'react-native-image-viewing';
+
 const API_BASE_URL = 'https://pc.beyourownself.co.za/api';
+const IMAGE_BASE_URL = 'https://pc.beyourownself.co.za/'; 
 
 type SearchResult = {
-  id: string;
+  id: number;
   place_name: string;
-  description?: string;
-  image_url?: string;
+  description: string;
+  email: string;
+  images: string; // JSON string array
+  address: string;
+  fee: string;
+  extras: string[];
+  note?: string;
+  video_link?: string;
+  comments?: any[];
 };
 
 const SearchComponent = () => {
@@ -26,99 +39,165 @@ const SearchComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  
+  // Modal & Viewer State
   const [selectedPost, setSelectedPost] = useState<SearchResult | null>(null);
+  const [isImageViewVisible, setIsImageViewVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Debounce input
+  // Debounce logic
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 500);
+    const handler = setTimeout(() => setDebouncedQuery(query), 500);
     return () => clearTimeout(handler);
   }, [query]);
 
-  // Fetch search results
+  // Fetch logic
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setResults([]);
       return;
     }
-
     const fetchResults = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.post(`${API_BASE_URL}/search`, {
-          query: debouncedQuery,
-        });
+        const response = await axios.post(`${API_BASE_URL}/search`, { query: debouncedQuery });
         setResults(response.data);
       } catch (err: any) {
-        setError(err.response?.data?.message || err.message || 'Failed to fetch results');
+        setError(err.message || 'Failed to fetch results');
       } finally {
         setLoading(false);
       }
     };
-
     fetchResults();
   }, [debouncedQuery]);
+
+  // Image helpers
+  const getImagesArray = (imgString: string | undefined) => {
+    if (!imgString) return [];
+    try {
+      return JSON.parse(imgString).map((img: string) => ({ 
+        uri: `${IMAGE_BASE_URL}${img.replace(/\\/g, '')}` 
+      }));
+    } catch (e) { return []; }
+  };
+
+  const openImageViewer = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsImageViewVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    if (isImageViewVisible) {
+      setIsImageViewVisible(false);
+    } else {
+      setSelectedPost(null);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Search..."
+        placeholder="Search for car wash..."
         value={query}
         onChangeText={setQuery}
         style={styles.input}
       />
 
       {loading && <ActivityIndicator style={styles.loader} size="small" color="#000" />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <FlatList
         data={results}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.resultItem}>
-            <TouchableOpacity
-              style={styles.viewButtonText}
-              onPress={() => setSelectedPost(item)}
-            >
-             <Text style={styles.title}>{item.place_name}</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            style={styles.resultItem} 
+            onPress={() => setSelectedPost(item)}
+          >
+            <Text style={styles.resultTitle}>{item.place_name}</Text>
+		{item.fee > 0 && (
+		  <Text style={styles.resultSubtitle}> • R {item.fee}</Text>
+		)}
+          </TouchableOpacity>
         )}
-        ListEmptyComponent={
-          !loading && debouncedQuery ? (
-            <Text style={styles.noResults}>No results found</Text>
-          ) : null
-        }
       />
 
-      {/* Modal to show full post */}
+      {/* PopUp Modal */}
       <Modal
-        visible={!!selectedPost}
         transparent={true}
+        visible={!!selectedPost}
         animationType="slide"
-        onRequestClose={() => setSelectedPost(null)}
+        onRequestClose={handleCloseModal}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>{selectedPost?.place_name}</Text>
-              <Text>{selectedPost?.description}</Text>
-              <Text style={{ marginTop: 10 }}>{selectedPost?.address}</Text>            </ScrollView>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            {selectedPost && (
+              <ScrollView style={styles.card}>
+                <Text style={styles.placeName}>{selectedPost.place_name}</Text>
 
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setSelectedPost(null)}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+                {/* Horizontal Thumbnails */}
+                {getImagesArray(selectedPost.images).length > 0 && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {getImagesArray(selectedPost.images).map((img, index) => (
+                      <TouchableOpacity key={index} onPress={() => openImageViewer(index)}>
+                        <Image source={img} style={styles.thumbnail} />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
+
+                <Text style={styles.label}>{selectedPost.address}</Text>
+                <Text style={styles.description}>{selectedPost.description}</Text>
+                <Text style={styles.label}>Booking Fee: {selectedPost.fee} ZAR</Text>
+
+                {selectedPost.extras && (
+                  <Text style={styles.label}>
+                    Amenities: {selectedPost.extras.join(', ')}
+                  </Text>
+                )}
+
+                {selectedPost.note && (
+                  <Text style={styles.note}>Note: {selectedPost.note}</Text>
+                )}
+
+                {selectedPost.email && (
+                  <Text
+                    style={styles.email}
+                    onPress={() => Linking.openURL(`mailto:${selectedPost.email}`)}
+                  >
+                    Contact: {selectedPost.email}
+                  </Text>
+                )}
+
+                {selectedPost.video_link && (
+                  <Text
+                    style={styles.link}
+                    onPress={() => Linking.openURL(selectedPost.video_link!)}
+                  >
+                    ▶ Watch Video
+                  </Text>
+                )}
+              </ScrollView>
+            )}
+
+            <View style={styles.closeButtonWrapper}>
+              <Button title="✕ Close" onPress={() => setSelectedPost(null)} color="#333" />
+            </View>
           </View>
         </View>
       </Modal>
+
+      {/* Image Viewing Overlay */}
+      <ImageViewing
+        images={getImagesArray(selectedPost?.images)}
+        imageIndex={currentImageIndex}
+        visible={isImageViewVisible}
+        onRequestClose={() => setIsImageViewVisible(false)}
+      />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     padding: 16,
@@ -132,7 +211,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
     elevation: 3,
-  },
+},
   input: {
     height: 45,
     borderColor: '#ccc',
@@ -140,74 +219,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
-    placeholderTextColor: '#f5f5f5',
+    placeholderTextColor: 'black',
   },
-  loader: {
-    marginBottom: 10,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-  },
+  loader: { marginBottom: 10 },
   resultItem: {
-    padding: 12,
-    borderBottomColor: '#eee',
+    padding: 15,
     borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  title: {
-    color: '#000',
-    // fontWeight: 'bold',
-  },
-  viewButton: {
-    marginTop: 8,
-    backgroundColor: '#000',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  viewButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  noResults: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#666',
-  },
-  modalOverlay: {
+  resultTitle: { fontWeight: 'bold', fontSize: 16 },
+  resultSubtitle: { color: '#666', fontSize: 13, marginTop: 4 },
+  
+  // Modal Styles mirrored from your example
+  modalBackground: {
     flex: 1,
-    // backgroundColor: 'rgba(0,0,0,0.1)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  modalContent: {
-    margin: 20,
+  modalContainer: {
     backgroundColor: '#f1f1f1',
+    padding: 15,
+    borderRadius: 12,
+    width: '90%',
     maxHeight: '80%',
-
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 7,
   },
-  modalTitle: {
-    fontSize: 18,
-    // fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: '#333',
-    padding: 8,
+  card: { marginBottom: 10 },
+  placeName: { fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
+  thumbnail: { width: 100, height: 100, borderRadius: 8, marginBottom: 10, marginRight: 10 },
+  label: { fontSize: 14, color: '#333', marginBottom: 4 },
+  description: { fontSize: 14, marginBottom: 6, lineHeight: 20 },
+  note: { fontStyle: 'italic', marginBottom: 6, color: '#555' },
+  email: { color: 'blue', textDecorationLine: 'underline', marginBottom: 6 },
+  link: { color: 'blue', fontWeight: 'bold', marginBottom: 6 },
+  closeButtonWrapper: {
+    marginTop: 10,
     borderRadius: 8,
-    alignSelf: 'center',
-  },
-  closeButtonText: {
-    color: '#fff',
+    overflow: 'hidden',
+    borderColor: '#ccc',
+    borderWidth: 1,
   },
 });
- export default SearchComponent;
+
+export default SearchComponent;
