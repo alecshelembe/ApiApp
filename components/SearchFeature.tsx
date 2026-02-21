@@ -148,25 +148,16 @@ const SearchComponent = () => {
 
                 <Text style={styles.label}>{selectedPost.address}</Text>
                 <Text style={styles.description}>{selectedPost.description}</Text>
-                <Text style={styles.label}>Booking Fee: {selectedPost.fee} ZAR</Text>
+                <Text style={styles.label}>R {selectedPost.fee}</Text>
 
                 {selectedPost.extras && (
                   <Text style={styles.label}>
-                    Amenities: {selectedPost.extras.join(', ')}
+                    {selectedPost.extras.join(', ')}
                   </Text>
                 )}
 
                 {selectedPost.note && (
                   <Text style={styles.note}>Note: {selectedPost.note}</Text>
-                )}
-
-                {selectedPost.email && (
-                  <Text
-                    style={styles.email}
-                    onPress={() => Linking.openURL(`mailto:${selectedPost.email}`)}
-                  >
-                    Contact: {selectedPost.email}
-                  </Text>
                 )}
 
                 {selectedPost.video_link && (

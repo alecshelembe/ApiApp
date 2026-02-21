@@ -67,21 +67,12 @@ const ModalPopUp = ({ locationData, onClose }) => {
 
                 {actualLocation.extras && (
                   <Text style={styles.label}>
-                    Amenities: {actualLocation.extras.join(', ')}
+                    {actualLocation.extras.join(', ')}
                   </Text>
                 )}
 
                 {actualLocation.note && (
                   <Text style={styles.note}>Note: {actualLocation.note}</Text>
-                )}
-
-                {actualLocation.email && (
-                  <Text
-                    style={styles.email}
-                    onPress={() => Linking.openURL(`mailto:${actualLocation.email}`)}
-                  >
-                    Contact: {actualLocation.email}
-                  </Text>
                 )}
 
                 {actualLocation.video_link && (
