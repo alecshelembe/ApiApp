@@ -16,8 +16,8 @@ import {
 import axios from 'axios';
 import ImageViewing from 'react-native-image-viewing';
 
-const API_BASE_URL = 'https://pc.beyourownself.co.za/api';
-const IMAGE_BASE_URL = 'https://pc.beyourownself.co.za/'; 
+const API_BASE_URL = 'https://localhost.beyourownself.co.za/api';
+const IMAGE_BASE_URL = 'https://localhost.beyourownself.co.za/'; 
 
 type SearchResult = {
   id: number;

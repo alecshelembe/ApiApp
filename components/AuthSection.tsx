@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 
-const BASE_URL = 'https://pc.beyourownself.co.za/';
+const BASE_URL = 'https://localhost.beyourownself.co.za/';
 
 const AuthSection: React.FC = () => {
   const handlePress = (path: string) => {
