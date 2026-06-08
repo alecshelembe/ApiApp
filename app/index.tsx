@@ -121,13 +121,8 @@ const SocialPostCard: React.FC = () => {
           <Text style={styles.description}>{item.address}</Text>
           <Text style={styles.title}>{item.place_name}</Text>
           <Text style={styles.description}>{item.description}</Text>
-          <Text style={styles.description}>{item.note}</Text>
-          <View style={styles.closeButtonWrapper}>
-		  <Button 
-		    title="View Post" 
-		    onPress={() => Linking.openURL(`${BASE_URL}view-social-post/${item.id}`)} 		     
-		   />
-		</View>
+          <Text style={styles.description}>{item.fee}</Text>
+	  <Text style={styles.description}>{item.note}</Text>
         </View>
 
         {item.images && item.images.length > 0 ? (
@@ -318,13 +313,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
   },
-  closeButtonWrapper: {
-    marginTop: 2,
-    borderRadius: 8,
-    overflow: 'hidden', // gives rounded corners effect
-    borderWidth: 1,
-  },
-
   amenitiesText: {
     fontSize: 14,
     color: 'black',
