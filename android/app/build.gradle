@@ -109,13 +109,13 @@ android {
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
         release {
 	        storeFile file('my-release-key.jks')
 	        storePassword '01234567'
-	        keyAlias m-key-alias
-	        keyPassword '0123457'
+	        keyAlias 'myapp'
+	        keyPassword '01234567'
         }
     }
     packagingOptions {
