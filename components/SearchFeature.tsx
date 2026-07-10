@@ -98,7 +98,7 @@ const SearchComponent = () => {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Search for car wash..."
+        placeholder="Search..."
         value={query}
         onChangeText={setQuery}
         style={styles.input}
@@ -148,8 +148,9 @@ const SearchComponent = () => {
 
                 <Text style={styles.label}>{selectedPost.address}</Text>
                 <Text style={styles.description}>{selectedPost.description}</Text>
-                <Text style={styles.label}>R {selectedPost.fee}</Text>
-
+		{selectedPost.fee !== 0 && (
+			<Text style={styles.label}>{selectedPost.fee}</Text>
+		)}
                 {selectedPost.extras && (
                   <Text style={styles.label}>
                     {selectedPost.extras.join(', ')}
@@ -210,7 +211,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
-    placeholderTextColor: 'black',
   },
   loader: { marginBottom: 10 },
   resultItem: {
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   resultTitle: { fontWeight: 'bold', fontSize: 16 },
-  resultSubtitle: { color: '#666', fontSize: 13, marginTop: 4 },
+  resultSubtitle: { color: '#555', fontSize: 13, marginTop: 4 },
   
   // Modal Styles mirrored from your example
   modalBackground: {
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#f1f1f1',
     padding: 15,
-    borderRadius: 12,
-    width: '90%',
+    borderRadius: 16,
+    width: '100%',
     maxHeight: '80%',
     elevation: 10,
     shadowColor: '#000',
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   card: { marginBottom: 10 },
   placeName: { fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
-  thumbnail: { width: 100, height: 100, borderRadius: 8, marginBottom: 10, marginRight: 10 },
+  thumbnail: { width: 120, height: 120, borderRadius: 8, marginBottom: 10, marginRight: 12 },
   label: { fontSize: 14, color: '#333', marginBottom: 4 },
   description: { fontSize: 14, marginBottom: 6, lineHeight: 20 },
   note: { fontStyle: 'italic', marginBottom: 6, color: '#555' },

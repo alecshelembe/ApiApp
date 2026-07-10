@@ -121,7 +121,9 @@ const SocialPostCard: React.FC = () => {
           <Text style={styles.description}>{item.address}</Text>
           <Text style={styles.title}>{item.place_name}</Text>
           <Text style={styles.description}>{item.description}</Text>
-          <Text style={styles.description}>{item.fee}</Text>
+	  {item.fee !== 0 && (
+  		<Text style={styles.description}>{item.fee}</Text>
+	  )}
 	  <Text style={styles.description}>{item.note}</Text>
         </View>
 
@@ -232,7 +234,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContainer: { 
-	paddingBottom: 20,
+	paddingBottom: 30,
 	paddingTop:20,
 	padding: 8,
 	backgroundColor: "#000000", 
@@ -245,8 +247,8 @@ const styles = StyleSheet.create({
 
     borderRadius: 16,
     padding: 16,
-    marginTop:18,
-    marginBottom: 18,
+    marginTop: 8,
+    marginBottom: 8,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
   },
@@ -285,10 +287,10 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 18, fontWeight: "600", marginBottom: 4, color: "#333" },
   date: { fontSize: 12, color: "#777", marginBottom: 8 },
-  fee: { fontSize: 16, marginBottom: 8, color: "#444" },
+  fee: { fontSize: 16, marginBottom: 8, color: "#555" },
   description: { fontSize: 15, color: "#555", marginBottom: 6, lineHeight: 22 },
   imageContainer: { marginBottom: 16, flexDirection: "row" },
-  image: { width: 200, height: 200, borderRadius: 16, marginRight: 12 },
+  image: { width: 120, height: 120, borderRadius: 16, marginRight: 12 },
   commentsContainer: { marginTop: 16 },
   commentsTitle: { fontWeight: "600", marginBottom: 8, color: "#333" },
   commentText: { fontSize: 14, color: "#666", marginBottom: 4 },
@@ -307,7 +309,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   amenitiesContainer: {
-    marginTop: 16,
+    marginTop: 10,
   },
   amenitiesTitle: {
     fontWeight: '600',
