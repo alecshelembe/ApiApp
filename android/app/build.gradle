@@ -106,16 +106,17 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+	release {
+                storeFile file('my-release-key.jks')
+                storePassword '01234567'
+                keyAlias 'myapp'
+                keyPassword '01234567'
+        }
+
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.release
-        }
-        release {
-	        storeFile file('my-release-key.jks')
-	        storePassword '01234567'
-	        keyAlias 'myapp'
-	        keyPassword '01234567'
         }
     }
     packagingOptions {
